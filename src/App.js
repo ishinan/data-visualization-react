@@ -63,7 +63,13 @@ render(){
               Currency
           </div>
           <div className="BarChart-header--base-selection" id='base-selection'>
-              Base
+              Base: 
+              <select>
+                {this.state.baseCurrencies.map(item => (
+                  <option value={item}>{item}</option>
+                ))}
+              </select>
+              {}
           </div>
         </div>
         <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
