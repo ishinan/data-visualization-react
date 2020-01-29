@@ -6,13 +6,51 @@ class App extends Component {
   state = {
     baseCurrency: "EUR",
     baseCurrencies: ['CAD','HKD','ISK','PHP','DKK','HUF','CZK','AUD','RON','SEK','IDR','INR','BRL','RUB','HRK','JPY','THB','CHF','SGD','PLN','BGN','TRY','CNY','NOK','NZD','ZAR','USD','MXN','ILS','GBP','KRW','MYR','EUR'],
-    currencies: ['USD', 'HKD', 'AUD', 'GBP', 'CNY'],
-    exchangeRates: "", 
-    exchangeBase: "",
-    exchangeDate: "",
+    currencies: ['USD', 'HKD', 'AUD', 'GBP', 'CNY', 'EUR'],
+    heights: [],
+    exchangeRates: {}, 
+    exchangeBase: "EUR",
+    exchangeDate: "1970-01-01",
   }
 
- 
+calcHeights(selectedCurrencies, allRates){
+  let largest = 1;
+  for (const currency of selectedCurrencies) {
+      if (allRates[currency] > largest) {
+          largest = allRates[currency];
+      }
+  }
+  const maxHeight = 240;
+  const Heights = [];
+  for (const currency of selectedCurrencies) {
+    let calculatedHeight = maxHeight / largest * allRates[currency]
+    Heights.push({ height: +calculatedHeight.toFixed(0)});
+  }
+  return Heights;
+}
+
+componentDidMount(){
+  let url=`https://api.exchangeratesapi.io/latest?base=${this.state.baseCurrency}`;
+  fetch(url)
+  .then(res => res.json())
+  .then(fetchedData => {
+    console.log('fetch...');
+    console.log(fetchedData);
+
+    fetchedData.rates['EUR'] = 1.00;
+    const Heights = this.calcHeights(this.state.currencies, fetchedData.rates);
+    console.log(Heights)
+    // Initial Base rate
+    this.setState({
+      exchangeRates: fetchedData.rates,
+      exchangeBase: fetchedData.base,
+      exchangeDate: fetchedData.date,
+      heights: Heights,
+    })
+    console.log(this.state.exchangeRates);
+  })
+} 
+
 render(){
   return (
     <div className='Container' >
@@ -30,8 +68,8 @@ render(){
         </div>
         <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
         <div className='BarChart-frame' id='chart-location'>
-          {this.state.currencies.map( (item) => (
-            <div className='BarChart-bar' style={{height: 80}}>{item}: 1.00</div>
+          {this.state.currencies.map( (item, indx) => (
+            <div className='BarChart-bar' style={this.state.heights[indx]}>{item}: {this.state.exchangeRates[item]}</div>
           ))}
         </div>
       </div>
