@@ -26,9 +26,11 @@ class App extends Component {
   }
  
   formatRates = (ObjCurrencyRates) => {
-    for (const key in ObjCurrencyRates) {
-      ObjCurrencyRates[key] = ObjCurrencyRates[key].toFixed(3)
+    let updateObj = { ...ObjCurrencyRates };
+    for (const key in updateObj) {
+      updateObj[key] = updateObj[key].toFixed(3)
     }
+    return  updateObj;
   }
   calcHeights(selectedCurrencies, allRates){
     let largest = 1;
@@ -49,33 +51,8 @@ class App extends Component {
   }
 
   componentDidMount(){
-    let url=`https://api.exchangeratesapi.io/latest?base=${this.state.baseCurrency}`;
-    fetch(url)
-    .then(res => res.json())
-    .then(fetchedData => {
-      console.log('Initial fetch...');
-      console.log(fetchedData);
-
-      // Add BaseCurrency as 1.0
-      fetchedData.rates[this.state.baseCurrency] = 1.00;
-
-      // Change rates to two digits floating
-      this.formatRates(fetchedData.rates)
-
-      // Calculate Heights of bars
-      const Heights = this.calcHeights(this.state.currencies, fetchedData.rates);
-      console.log('Initial heights:', Heights)
-
-      // Initial Base rate
-      this.setState({
-        exchangeRates:  fetchedData.rates,
-        exchangeBase: fetchedData.base,
-        exchangeDate: fetchedData.date,
-        heights: Heights,
-      })
-    })
-  } 
-
+    this.updateChart(this.state.baseCurrency) 
+  }
   updateChart = (Base) =>{
     let url=`https://api.exchangeratesapi.io/latest?base=${Base}`;
     fetch(url)
@@ -84,13 +61,11 @@ class App extends Component {
       console.log('Update fetch...');
       console.log(fetchedData);
 
-
-      // Add BaseCurrency as 1.0
       fetchedData.rates[Base] = 1.00;
 
       // Change rates to two digits floating
-      this.formatRates(fetchedData.rates)
-
+      let formatedRates = this.formatRates(fetchedData.rates)
+      console.log('formated', formatedRates)
 
       const currenciesWithNewBase = this.stateArrayPush(this.state.currencies, Base);
       const updatedCurrencies = this.stateArrayRemove(currenciesWithNewBase, this.state.baseCurrency)
@@ -100,7 +75,7 @@ class App extends Component {
 
       // Initial Base rate
       this.setState({
-        exchangeRates: fetchedData.rates,
+        exchangeRates: formatedRates,
         exchangeBase: fetchedData.base,
         exchangeDate: fetchedData.date,
         heights: Heights,
