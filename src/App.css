@@ -55,7 +55,7 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 
 .footer {
 height: 2.5rem;
-margin-top: 1rem;
+margin-top: 2rem;
 text-align: center;
 grid-area: footer;
 /* border: 1px solid black; */

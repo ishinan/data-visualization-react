@@ -37,7 +37,8 @@ componentDidMount(){
     console.log('fetch...');
     console.log(fetchedData);
 
-    fetchedData.rates['EUR'] = 1.00;
+    // Add BaseCurrency as 1.0
+    fetchedData.rates[this.state.baseCurrency] = 1.00;
     const Heights = this.calcHeights(this.state.currencies, fetchedData.rates);
     console.log(Heights)
     // Initial Base rate
@@ -51,22 +52,21 @@ componentDidMount(){
   })
 } 
 
-onClickBaseCurrencyHandler(ev){
-  console.log(ev.target.value);
-  this.setState({
-    baseCurrency: ev.target.value,
-  })
-}
+onChangeBaseCurrencyHandler = (ev) => {
+  console.log('Event:', ev.target.value);
+  const baseCurrency = ev.target.value;
+  this.updateChart(baseCurrency) 
+} 
 
-updateChart = ()=>{
-  let url=`https://api.exchangeratesapi.io/latest?base=${this.state.baseCurrency}`;
+updateChart = (Base) =>{
+  let url=`https://api.exchangeratesapi.io/latest?base=${Base}`;
   fetch(url)
   .then(res => res.json())
   .then(fetchedData => {
     console.log('fetch...');
     console.log(fetchedData);
 
-    fetchedData.rates['EUR'] = 1.00;
+    fetchedData.rates[Base] = 1.00;
     const Heights = this.calcHeights(this.state.currencies, fetchedData.rates);
     console.log(Heights)
     // Initial Base rate
@@ -75,13 +75,14 @@ updateChart = ()=>{
       exchangeBase: fetchedData.base,
       exchangeDate: fetchedData.date,
       heights: Heights,
+      baseCurrency: Base,
     })
     console.log(this.state.exchangeRates);
   })
-} 
+}
 
 render(){
-
+  console.log('In render()', this.state.baseCurrency)
   return (
     <div className='Container' >
       <div className='header'>
@@ -93,6 +94,7 @@ render(){
               Currency
           </div>
           <div className="BarChart-header--base-selection" id='base-selection'>
+              <form>
               Base: 
               <select onChange={this.onChangeBaseCurrencyHandler}>
                 {this.state.baseCurrencies.map(item => (
@@ -101,7 +103,7 @@ render(){
                   : <option value={item}>{item}</option>
                 ))}
               </select>
-              {}
+              </form>
           </div>
         </div>
         <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
