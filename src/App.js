@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
@@ -31,6 +30,7 @@ render(){
         </div>
         <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
         <div className='BarChart-frame' id='chart-location'>
+          <div className='BarChart-bar' style={{ height: 80}}>EUR: 1.00</div>
         </div>
       </div>
       <div className='footer'>
