@@ -30,7 +30,9 @@ render(){
         </div>
         <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
         <div className='BarChart-frame' id='chart-location'>
-          <div className='BarChart-bar' style={{ height: 80}}>EUR: 1.00</div>
+          {this.state.currencies.map( (item) => (
+            <div className='BarChart-bar' style={{height: 80}}>{item}: 1.00</div>
+          ))}
         </div>
       </div>
       <div className='footer'>
