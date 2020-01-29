@@ -55,7 +55,7 @@ class App extends Component {
   componentDidMount(){
     this.updateChart(this.state.baseCurrency) 
   }
-  updateChart = (Base) =>{
+  updateChart = (Base, Currencies) =>{
     let url=`https://api.exchangeratesapi.io/latest?base=${Base}`;
     fetch(url)
     .then(res => res.json())
@@ -69,13 +69,17 @@ class App extends Component {
       let formatedRates = this.formatRates(fetchedData.rates)
       console.log('formated', formatedRates)
 
+      let updatedCurrencies = [];
+      if ( this.state.baseCurrency !== Base ){
       const currenciesWithNewBase = this.stateArrayPush(this.state.currencies, Base);
-      const updatedCurrencies = this.stateArrayRemove(currenciesWithNewBase, this.state.baseCurrency)
+      updatedCurrencies = this.stateArrayRemove(currenciesWithNewBase, this.state.baseCurrency)
+      } else {
+        updatedCurrencies = this.state.currencies;
+      }
 
       const Heights = this.calcHeights(updatedCurrencies, fetchedData.rates);
       console.log('Updated heights:', Heights)
 
-      // Initial Base rate
       this.setState({
         exchangeRates: formatedRates,
         listCurrencies: Object.keys(formatedRates).sort(),
@@ -92,7 +96,7 @@ class App extends Component {
 
   onChangeBaseCurrencyHandler = ev => {
     console.log('Event:', ev.target.value);
-  const baseCurrency = ev.target.value;
+    const baseCurrency = ev.target.value;
     this.updateChart(baseCurrency) 
   } 
 
