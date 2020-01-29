@@ -9,6 +9,7 @@ class App extends Component {
     currencies: ['USD', 'HKD', 'AUD', 'GBP', 'CNY', 'EUR'],
     heights: [],
     exchangeRates: {}, 
+    listCurrencies: [],
     exchangeBase: "EUR",
     exchangeDate: "1970-01-01",
   }
@@ -25,13 +26,14 @@ class App extends Component {
     return arrayUpdate;
   }
  
-  formatRates = (ObjCurrencyRates) => {
+  formatRates = ObjCurrencyRates => {
     let updateObj = { ...ObjCurrencyRates };
     for (const key in updateObj) {
       updateObj[key] = updateObj[key].toFixed(3)
     }
     return  updateObj;
   }
+
   calcHeights(selectedCurrencies, allRates){
     let largest = 1;
     for (const currency of selectedCurrencies) {
@@ -76,6 +78,7 @@ class App extends Component {
       // Initial Base rate
       this.setState({
         exchangeRates: formatedRates,
+        listCurrencies: Object.keys(formatedRates).sort(),
         exchangeBase: fetchedData.base,
         exchangeDate: fetchedData.date,
         heights: Heights,
@@ -87,12 +90,15 @@ class App extends Component {
   }
 
 
-  onChangeBaseCurrencyHandler = (ev) => {
+  onChangeBaseCurrencyHandler = ev => {
     console.log('Event:', ev.target.value);
   const baseCurrency = ev.target.value;
     this.updateChart(baseCurrency) 
   } 
 
+  onClickCurrencyHandler = ev => {
+    console.log('Event:', ev.target.value);
+  }
   render(){
     return (
       <div className='Container' >
@@ -117,7 +123,14 @@ class App extends Component {
                 </form>
             </div>
           </div>
-          <div className='BarChart-choices' id="list-box">List Of Currencies: </div>
+          <div className='BarChart-choices' id="list-box">List Of Currencies: 
+          {this.state.listCurrencies.map( item => (
+             this.state.currencies.includes(item)?
+            <button className='btn--selected' value={item} onClick={this.onClickCurrencyHandler}>{item}</button> :
+            <button value={item} onClick={this.onClickCurrencyHandler}>{item}</button>
+
+          ))}
+          </div>
           <div className='BarChart-frame' id='chart-location'>
             {this.state.currencies.map( (item, indx) => (
               <div className='BarChart-bar' style={this.state.heights[indx]}>{item} <br/>
