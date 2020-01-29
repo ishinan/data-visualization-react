@@ -51,7 +51,37 @@ componentDidMount(){
   })
 } 
 
+onClickBaseCurrencyHandler(ev){
+  console.log(ev.target.value);
+  this.setState({
+    baseCurrency: ev.target.value,
+  })
+}
+
+updateChart = ()=>{
+  let url=`https://api.exchangeratesapi.io/latest?base=${this.state.baseCurrency}`;
+  fetch(url)
+  .then(res => res.json())
+  .then(fetchedData => {
+    console.log('fetch...');
+    console.log(fetchedData);
+
+    fetchedData.rates['EUR'] = 1.00;
+    const Heights = this.calcHeights(this.state.currencies, fetchedData.rates);
+    console.log(Heights)
+    // Initial Base rate
+    this.setState({
+      exchangeRates: fetchedData.rates,
+      exchangeBase: fetchedData.base,
+      exchangeDate: fetchedData.date,
+      heights: Heights,
+    })
+    console.log(this.state.exchangeRates);
+  })
+} 
+
 render(){
+
   return (
     <div className='Container' >
       <div className='header'>
@@ -64,9 +94,11 @@ render(){
           </div>
           <div className="BarChart-header--base-selection" id='base-selection'>
               Base: 
-              <select>
+              <select onChange={this.onChangeBaseCurrencyHandler}>
                 {this.state.baseCurrencies.map(item => (
-                  <option value={item}>{item}</option>
+                  item === this.state.baseCurrency? 
+                  <option value={item} selected>{item}</option>
+                  : <option value={item}>{item}</option>
                 ))}
               </select>
               {}
