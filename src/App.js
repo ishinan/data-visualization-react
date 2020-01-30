@@ -15,8 +15,9 @@ class App extends Component {
   }
 
   stateArrayPush = (srcArray, newItem) => {
-    const arrayAdd = srcArray.slice(); // duplicating array
+    let arrayAdd = srcArray.slice(); // duplicating array
     arrayAdd.push(newItem);
+    arrayAdd = [ ...new Set(arrayAdd)];
     return arrayAdd;
   }
   
@@ -29,7 +30,7 @@ class App extends Component {
   formatRates = ObjCurrencyRates => {
     let updateObj = { ...ObjCurrencyRates };
     for (const key in updateObj) {
-      updateObj[key] = updateObj[key].toFixed(3)
+      updateObj[key] = updateObj[key].toFixed(2)
     }
     return  updateObj;
   }
@@ -37,7 +38,7 @@ class App extends Component {
   calcHeights(selectedCurrencies, allRates){
     let largest = 1;
     for (const currency of selectedCurrencies) {
-        console.log('Calc:', currency, allRates[currency])
+        //console.log('Calc:', currency, allRates[currency])
         if ( +allRates[currency] > largest) {
             largest = allRates[currency];
         }
@@ -55,7 +56,8 @@ class App extends Component {
   componentDidMount(){
     this.updateChart(this.state.baseCurrency) 
   }
-  updateChart = (Base, Currencies) =>{
+
+  updateChart = Base => {
     let url=`https://api.exchangeratesapi.io/latest?base=${Base}`;
     fetch(url)
     .then(res => res.json())
@@ -71,14 +73,14 @@ class App extends Component {
 
       let updatedCurrencies = [];
       if ( this.state.baseCurrency !== Base ){
-      const currenciesWithNewBase = this.stateArrayPush(this.state.currencies, Base);
+      const currenciesWithNewBase = this.stateArrayPush(this.state.currencies, Base)
       updatedCurrencies = this.stateArrayRemove(currenciesWithNewBase, this.state.baseCurrency)
       } else {
         updatedCurrencies = this.state.currencies;
       }
 
       const Heights = this.calcHeights(updatedCurrencies, fetchedData.rates);
-      console.log('Updated heights:', Heights)
+      // console.log('Updated heights:', Heights)
 
       this.setState({
         exchangeRates: formatedRates,
@@ -102,7 +104,21 @@ class App extends Component {
 
   onClickCurrencyHandler = ev => {
     console.log('Event:', ev.target.value);
+    const selectedItem = ev.target.value;
+    let ListWithClickedCurrency = this.state.currencies.includes(selectedItem) ? this.stateArrayRemove(this.state.currencies, selectedItem) :
+      this.stateArrayPush(this.state.currencies, selectedItem);
+    console.log('ListWithClickedCurrency', ListWithClickedCurrency);
+
+    const Heights = this.calcHeights(ListWithClickedCurrency, this.state.exchangeRates)
+
+    this.setState({
+      currencies: ListWithClickedCurrency,
+      heights: Heights,
+    })
+    
   }
+
+
   render(){
     return (
       <div className='Container' >
