@@ -3,7 +3,7 @@ This project is to present a bar chart of currency exchange rates using React te
 ## Overview
 
 - A Simple React to fetch exchange currency data and present them as a bar chart.
-- A public site (https://data-visualization-react.herokuapp.com)
+- A public site (Not available anymore)
 - Sample Image
   
   ![Sample Chart](sample_chart.png)
